@@ -1,0 +1,56 @@
+provider:
+  name: aws
+  runtime: nodejs19.x
+  lambdaHashingVersion: "20200924"
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:GetItem
+            - dynamodb:scan
+          resource:
+            - arn:aws:dynamodb:us-east-1:210147813215:table/ItemTableNow
+
+function:
+  hello:
+    handler: src/handler.hello
+    events:
+      - http:
+          path: /
+          method: get
+  InserItem:
+    handler: src/insertItem.handler
+    events:
+      - http:
+          path: /item
+          method: post
+  fetchItems:
+    handler: src/fetchItems.handler
+    events:
+      - http:
+          path: /item
+          method: get
+  fetchItem:
+    handler: src/fetchItem.handler
+    events:
+      - http:
+          path: /item
+          method: get
+
+resources:
+  Resources:
+    ItemTableNew:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ItemTableNew
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinition:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
